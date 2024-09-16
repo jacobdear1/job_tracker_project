@@ -1,0 +1,39 @@
+# contains the necessary commands to compose a multi-tier docker application
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    # add necessary environment variables
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY=${SECRET_KEY}
+    # mount volume to persist database file
+    volumes:
+      - backend-data:/app
+    networks:
+      - app-network
+    # environment variabkes come from the .env file
+    env_file:
+      - .env
+
+  frontend:
+    build:
+      context: ./job-tracker-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  backend-data:
