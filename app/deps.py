@@ -14,16 +14,11 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        print('try')
-        print(token)
         payload = jwt.decode(token, config.settings.SECRET_KEY, algorithms=[config.settings.ALGORITHM])
-        print(payload)
         email: str = payload.get("sub")
         if email is None:
-            print('em error')
             raise credentials_exception
     except JWTError:
-        print('jwt')
         raise credentials_exception
 
     user = crud.get_user(db, email=email)

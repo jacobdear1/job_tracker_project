@@ -1,5 +1,6 @@
 # crud operations
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app import models, schemas
 from passlib.context import CryptContext
 from fastapi import HTTPException
@@ -12,11 +13,17 @@ def get_user(db: Session, email: str):
 
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = pwd_context.hash(user.password)
-    db_user = models.User(email=user.email, hashed_password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    try: 
+        db_user = models.User(email=user.email, hashed_password=hashed_password)
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except IntegrityError:
+        db.rollback()
+        HTTPException(status_code=409, detail="Email already registered, try again!")
+
+    #return db_user
 
 def create_application(db: Session, application: schemas.JobApplicationCreate, user_id: int):
     db_application = models.JobApplication(**application.dict(), owner_id=user_id)

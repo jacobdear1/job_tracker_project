@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app import crud, schemas, models, database, auth, deps
 from fastapi.security import OAuth2PasswordRequestForm
@@ -6,6 +7,15 @@ from fastapi.security import OAuth2PasswordRequestForm
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
+
+# Add CORS middleware, allows for communication with React frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins (you can restrict this to your frontend's URL)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, PUT, DELETE, OPTIONS, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 
 # tested and works 
 # this here either creates a new user or informs the user has already been registered
