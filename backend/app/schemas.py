@@ -18,7 +18,7 @@ class JobApplication(JobApplicationBase):
     owner_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserBase(BaseModel):
     email: str
@@ -30,4 +30,5 @@ class User(UserBase):
     id: int
 
     class Config:
-        orm_mode = True
+        # changed from orm_mode in pydantic v2
+        from_attributes = True

@@ -31,7 +31,10 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)
 
 @app.post("/token")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
+    print(database.get_db)
+    print(form_data.username)
     user = crud.get_user(db, email=form_data.username)
+    print(user)
     if not user or not auth.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = auth.create_access_token(data={"sub": user.email})
